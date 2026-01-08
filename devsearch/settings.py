@@ -23,12 +23,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = 'django-insecure-&ke^ms%)hgu-l1ja9#l0c3k5w6^k32ice=1q-tjn35j#5lxooj'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-secret-key')
+#new
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+#DEBUG = False
+DEBUG = ENVIRONMENT != "production"
 
-ALLOWED_HOSTS = ['*']
+
+#ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '.railway.app',
+]
+
 
 
 # Application definition
@@ -124,7 +136,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-#STATIC_URL = 'static/'
+STATIC_URL = 'static/'
 #MEDIA_URL = '/images/'
 MEDIA_URL = '/media/'
 
@@ -150,5 +162,16 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
+
+
+if ENVIRONMENT == "production":
+    CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+else:
+    CSRF_TRUSTED_ORIGINS = []
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+
 
 

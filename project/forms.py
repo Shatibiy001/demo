@@ -23,8 +23,5 @@ class ProjectForm(forms.ModelForm):
                 'class': 'form-input',
                 'placeholder': 'Source Code Link'
             }),
-            'tags': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'Comma-separated tags'
-            }),
+            
         }
