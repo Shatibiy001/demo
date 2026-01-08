@@ -1,0 +1,238 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  :root {
+    --primary: #6366f1;          /* Indigo-ish blue */
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --bg-start: #f0f5ff;         /* Very light blue */
+    --bg-end: #e0e7ff;           /* Soft blue-white */
+    --card: #ffffff;
+    --text: #111827;
+    --text-light: #64748b;
+    --border: #e0e7ff;
+    --shadow-sm: 0 4px 12px rgba(99, 102, 241, 0.08);
+    --shadow-md: 0 12px 30px rgba(99, 102, 241, 0.12);
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .account-container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.5rem 1rem 5rem;
+  }
+
+  .profile-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 4.5rem 2.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .avatar-container {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid rgba(255,255,255,0.9);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+  }
+
+  .section-title {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 3.5rem 0 1.5rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 70px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  .bio {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    line-height: 1.8;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .skill-tag {
+    background: rgba(99, 102, 241, 0.08);
+    color: var(--primary);
+    padding: 0.65rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: 0.98rem;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    transition: all 0.25s ease;
+  }
+
+  .skill-tag:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+  }
+
+  .project-card {
+    background: var(--card);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .project-card:hover {
+    transform: translateY(-12px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .project-img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+  }
+
+  .project-info {
+    padding: 1.4rem;
+  }
+
+  .project-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  .project-stats {
+    color: var(--text-light);
+    font-size: 0.92rem;
+    margin-top: 0.8rem;
+  }
+</style>
+
+<div class="account-container">
+  <div class="profile-hero">
+    <div class="avatar-container">
+      {% if profile.profile_image %}
+        <img src="{{ profile.profile_image.url }}" alt="{{ profile.name }}" class="avatar">
+      {% else %}
+        <div class="avatar" style="background: linear-gradient(135deg, #818cf8, #6366f1); display:flex; align-items:center; justify-content:center; font-size:5rem; color:white;">
+          {{ profile.name|default:profile.user.username|slice:":1"|upper }}
+        </div>
+      {% endif %}
+    </div>
+    <a href="{% url 'edit-account' %}" class="btn" style="background:var(--primary); color:white; padding:0.9rem 2rem; border-radius:10px; text-decoration:none;">
+      Edit Profile
+    </a>
+    <h1>{{ profile.name|default:profile.user.username }}</h1>
+    {% if profile.short_intro %}
+      <p style="font-size:1.35rem; opacity:0.95; max-width:680px; margin:1rem auto 0;">
+        {{ profile.short_intro }}
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="bio">
+    <h2 class="section-title">About Me</h2>
+    {% if profile.bio %}
+      {{ profile.bio|linebreaks }}
+    {% else %}
+      <p style="color:var(--text-light); font-style:italic;">
+        Your story, experience, and passion — share it here...
+      </p>
+    {% endif %}
+  </div>
+
+  <div>
+    <h2 class="section-title">Skills & Technologies</h2>
+    <div class="skills-container">
+      {% for skill in profile.skill_set.all %}
+        <span class="skill-tag">{{ skill.name }}</span>
+      {% empty %}
+        <span style="color:var(--text-light);">No skills added yet</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div>
+    <h2 class="section-title">My Projects</h2>
+    {% if projects %}
+      <div class="projects-grid">
+        {% for project in projects %}
+          <a href="{% url 'project' project.id %}" class="project-card" style="text-decoration:none; color:inherit;">
+            {% if project.featured_image %}
+              <img src="{{ project.featured_image.url }}" alt="{{ project.title }}" class="project-img">
+            {% else %}
+              <div class="project-img" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display:flex; align-items:center; justify-content:center; color:white; font-size:5rem;">
+                {{ project.title|slice:":1" }}
+              </div>
+            {% endif %}
+            <div class="project-info">
+              <h3 class="project-title">{{ project.title }}</h3>
+              <p style="color:var(--text-light); margin:0.6rem 0;">
+                {{ project.description|truncatewords:20 }}
+              </p>
+              <div class="project-stats">
+                <strong>{{ project.vote_ratio }}%</strong> Positive • 
+                {{ project.vote_total }} votes
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="background:var(--card); border-radius:16px; padding:3rem; text-align:center; color:var(--text-light);">
+        You haven't added any projects yet...
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+
+
+{% endblock content %}

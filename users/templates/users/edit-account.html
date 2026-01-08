@@ -1,0 +1,195 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --bg-start: #f0f5ff;
+    --bg-end: #e0e7ff;
+    --card: #ffffff;
+    --text: #111827;
+    --text-light: #64748b;
+    --border: #d1d5db;
+    --shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .edit-container {
+    max-width: 900px;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+  }
+
+  .edit-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .edit-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 4rem 3rem 3rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: -90px auto 1.5rem;
+  }
+
+  .avatar-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid white;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  }
+
+  .form-section {
+    padding: 3rem 3rem 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.8rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.25s;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
+  }
+
+  .btn-save {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-save:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99,102,241,0.3);
+  }
+
+  .current-image-hint {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+  }
+</style>
+
+<div class="edit-container">
+  <div class="edit-card">
+
+    <div class="edit-header">
+      <div class="avatar-wrapper">
+        {% if profile.profile_image %}
+          <img src="{{ profile.profile_image.url }}" alt="Profile" class="avatar-preview">
+        {% else %}
+          <div class="avatar-preview" style="background: linear-gradient(135deg, #818cf8, #6366f1); display:flex; align-items:center; justify-content:center; color:white; font-size:5rem;">
+            {{ profile.name|default:profile.user.username|slice:":1"|upper }}
+          </div>
+        {% endif %}
+      </div>
+
+      <h1>Edit Your Profile</h1>
+      <p style="opacity:0.9; margin-top:0.8rem;">Make your profile stand out</p>
+    </div>
+
+    <div class="form-section">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="id_name">Full Name</label>
+          {{ form.name }}
+        </div>
+
+        <div class="form-group">
+          <label for="id_short_intro">Short Introduction</label>
+          {{ form.short_intro }}
+          <small style="color:var(--text-light);">e.g. Full-stack developer • Python & React</small>
+        </div>
+
+        <div class="form-group">
+          <label for="id_bio">About Me / Bio</label>
+          {{ form.bio }}
+        </div>
+
+        <div class="form-group">
+          <label for="id_profile_image">Profile Picture</label>
+          {{ form.profile_image }}
+          {% if profile.profile_image %}
+            <div class="current-image-hint">
+              Current image: <img src="{{ profile.profile_image.url }}" style="width:60px; height:60px; border-radius:50%; vertical-align:middle;">
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label>Social Links</label>
+          <div style="display:grid; gap:1rem; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));">
+            {{ form.social_github }}
+            {{ form.social_twitter }}
+            {{ form.social_linkedin }}
+            {{ form.social_website }}
+          </div>
+        </div>
+
+        <!-- Optional: add location, email, etc. -->
+        <div class="form-group">
+          {{ form.location }}
+        </div>
+
+        <div style="text-align:center; margin-top:3rem;">
+          <button type="submit" class="btn-save">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:2rem;">
+    <a href="{% url 'account' %}" style="color:var(--primary); font-weight:600; text-decoration:none;">
+      ← Back to Profile
+    </a>
+  </div>
+</div>
+
+{% endblock content %}

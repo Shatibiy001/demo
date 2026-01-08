@@ -1,0 +1,274 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  :root {
+    --primary: #5e60ce;
+    --primary-dark: #4d4fc2;
+    --primary-light: #7678ed;
+    --bg: #f8f9ff;
+    --card-bg: #ffffff;
+    --text: #2d3748;
+    --text-light: #718096;
+    --border: #e2e8f0;
+    --success: #10b981;
+  }
+
+  body {
+    background: var(--bg);
+  }
+
+  .project-detail-container {
+    max-width: 1100px;
+    margin: 4rem auto 6rem;
+    padding: 0 1.5rem;
+  }
+
+  .project-title-wrapper {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .project-title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #5e60ce 0%, #7678ed 50%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .project-subtitle {
+    font-size: 1.3rem;
+    color: var(--text-light);
+    margin-top: 1rem;
+    font-weight: 400;
+  }
+
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2.5rem;
+    margin: 1.5rem 0 3rem;
+    color: var(--text-light);
+    font-size: 1.1rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .project-image-container {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    margin-bottom: 3rem;
+    background: white;
+    border: 1px solid var(--border);
+    transition: transform 0.4s ease;
+  }
+
+  .project-image-container:hover {
+    transform: translateY(-8px);
+  }
+
+  .project-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .project-content {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+    border: 1px solid var(--border);
+  }
+
+  .project-description {
+    line-height: 1.9;
+    color: var(--text);
+    font-size: 1.15rem;
+    white-space: pre-line;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.8rem;
+    margin: 2.5rem 0;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, rgba(94,96,206,0.08) 0%, rgba(118,120,237,0.08) 100%);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(94,96,206,0.18);
+  }
+
+  .stat-number {
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #5e60ce, #7678ed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-label {
+    color: var(--text-light);
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+  }
+
+  .project-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    justify-content: center;
+    margin-top: 4rem;
+  }
+
+  .btn {
+    padding: 1rem 2.2rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-back {
+    background: #f1f5f9;
+    color: #334155;
+  }
+
+  .btn-back:hover {
+    background: #e2e8f0;
+    transform: translateY(-3px);
+  }
+
+  .btn-primary {
+    background: linear-gradient(90deg, #5e60ce, #7678ed);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(94,96,206,0.3);
+  }
+
+  .btn-danger {
+    background: #ef4444;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-3px);
+    }
+
+
+</style>
+
+<div class="project-detail-container">
+  <div class="project-title-wrapper">
+    <h1 class="project-title">{{ project.title }}</h1>
+    {% if project.owner %}
+      <p class="project-subtitle">
+        by {{ project.owner.name|default:project.owner.username|default:"Anonymous" }}
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="project-meta">
+    {% if project.owner %}
+    <div class="meta-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>{{ project.owner.name|default:project.owner.username|default:"Anonymous" }}</span>
+    </div>
+    {% endif %}
+    <div class="meta-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span>Created {{ project.created|timesince }} ago</span>
+    </div>
+  </div>
+
+  {% if project.featured_image and project.featured_image.name != 'projects/default.jpg' %}
+    <div class="project-image-container">
+      <img 
+        src="{{ project.featured_image.url }}" 
+        alt="{{ project.title }}" 
+        class="project-image"
+      >
+    </div>
+  {% else %}
+    <div style="height: 420px; background: linear-gradient(135deg, #5e60ce 0%, #7678ed 100%); 
+                border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; 
+                font-size: 8rem; margin-bottom: 3rem; box-shadow: 0 15px 35px rgba(0,0,0,0.15);">
+      📦
+    </div>
+  {% endif %}
+
+  <div class="project-content">
+    <div class="project-description">
+      {{ project.description|linebreaks }}
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">{{ project.vote_total }}</div>
+        <div class="stat-label">Total Votes</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-number">{{ project.vote_ratio }}%</div>
+        <div class="stat-label">Approval Rating</div>
+      </div>
+    </div>
+
+    {% if project.tags.exists %}
+      <div style="margin-top: 2.5rem;">
+        <h3 style="color: var(--primary); margin-bottom: 1.2rem; font-size: 1.5rem; font-weight: 600;">
+          Tags / Technologies
+        </h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.9rem;">
+          {% for tag in project.tags.all %}
+            <span style="background: #eef2ff; color: var(--primary); padding: 0.6rem 1.4rem; border-radius: 999px; font-size: 1rem; font-weight: 500;">
+              {{ tag.name }}
+            </span>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="project-footer">
+    <a href="{% url 'projects' %}" class="btn btn-back">← Back to All Projects</a>
+
+    {% if request.user.is_authenticated and project.owner and project.owner.user == request.user %}
+      <a href="{% url 'updateproject' project.id %}" class="btn btn-primary">Edit Project</a>
+      <a href="{% url 'deleteproject' project.id %}" class="btn btn-danger">Delete Project</a>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,245 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  :root {
+    --primary: #5e60ce;
+    --primary-dark: #4d4fc2;
+    --primary-light: #7678ed;
+    --bg: #f8f9ff;
+    --card-bg: #ffffff;
+    --text: #2d3748;
+    --text-light: #718096;
+    --border: #e2e8f0;
+    --error: #ef4444;
+    --success: #10b981;
+  }
+
+  body {
+    background: var(--bg);
+  }
+
+  .form-container {
+    max-width: 720px;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+  }
+
+  .form-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    padding: 2.5rem 2rem;
+    border: 1px solid var(--border);
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .form-header h1 {
+    font-size: 2.2rem;
+    color: var(--primary);
+    margin: 0 0 0.5rem;
+    font-weight: 700;
+  }
+
+  .form-header p {
+    color: var(--text-light);
+    font-size: 1.05rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.75rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: white;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(94, 96, 206, 0.15);
+  }
+
+  .form-control::placeholder {
+    color: #a0aec0;
+  }
+
+  textarea.form-control {
+    min-height: 140px;
+    resize: vertical;
+  }
+
+  .file-input-wrapper {
+    position: relative;
+  }
+
+  .file-input-wrapper input[type="file"] {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .custom-file-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 0.9rem 1.2rem;
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    background: #f8fafc;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .custom-file-upload:hover {
+    border-color: var(--primary);
+    background: rgba(94, 96, 206, 0.05);
+    color: var(--primary);
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-top: 1.5rem;
+  }
+
+  .btn-submit:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(94, 96, 206, 0.25);
+  }
+
+  .btn-submit:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .form-errors {
+    color: var(--error);
+    font-size: 0.9rem;
+    margin-top: 0.4rem;
+  }
+
+  .field-error {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+</style>
+
+<div class="form-container">
+  <div class="form-card">
+    <div class="form-header">
+      <h1>Create New Project</h1>
+      <p>Share your work with the community</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="projectForm">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div style="color: var(--error); margin-bottom: 1.5rem; padding: 1rem; background: #fee2e2; border-radius: 8px;">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+          
+          {% if field.name == 'featured_image' %}
+            <div class="file-input-wrapper">
+              <div class="custom-file-upload">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span>Choose project image</span>
+              </div>
+              {{ field }}
+            </div>
+          {% else %}
+            {{ field }}
+          {% endif %}
+
+          {% if field.errors %}
+            <div class="field-error">
+              {{ field.errors|striptags }}
+            </div>
+          {% endif %}
+
+          {% if field.help_text %}
+            <small style="color: #94a3b8; display: block; margin-top: 0.4rem;">
+              {{ field.help_text }}
+            </small>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn-submit" id="submitBtn">Create Project</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Optional: Basic form enhancements
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('projectForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Show loading state when submitting
+    form.addEventListener('submit', function(e) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
+    });
+
+    // File name preview (optional nice-to-have)
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+      fileInput.addEventListener('change', function(e) {
+        const fileName = e.target.files.length > 0 ? e.target.files[0].name : 'No file chosen';
+        const uploadText = document.querySelector('.custom-file-upload span');
+        if (uploadText) uploadText.textContent = fileName;
+      });
+    }
+  });
+</script>
+
+{% endblock content %}

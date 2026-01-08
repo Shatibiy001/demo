@@ -1,0 +1,248 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  :root {
+    --primary: #667eea;
+    --secondary: #764ba2;
+    --bg-gradient: linear-gradient(135deg, #667eea, #764ba2);
+    --card-bg: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --light-bg: #f9fafb;
+  }
+
+  body {
+    background: var(--bg-gradient);
+    min-height: 100vh;
+  }
+
+  .profile-page {
+    padding: 2.5rem 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .profile-header {
+    background: var(--bg-gradient);
+    color: white;
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+  }
+
+  .profile-header h1 {
+    margin: 0 0 0.6rem;
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+  }
+
+  .short-intro {
+    margin: 0;
+    opacity: 0.95;
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .profile-main {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+  }
+
+  .profile-layout {
+    display: grid;
+    grid-template-columns: 1fr 2.5fr;
+    gap: 2.5rem;
+  }
+
+  @media (max-width: 992px) {
+    .profile-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Sidebar - smaller & cleaner */
+  .profile-sidebar {
+    text-align: center;
+  }
+
+  .profile-image {
+    width: 100%;
+    max-width: 220px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    margin-bottom: 1.5rem;
+  }
+
+  .bio-section {
+    background: var(--light-bg);
+    border-radius: 14px;
+    padding: 1.8rem;
+    margin-bottom: 2rem;
+    border-left: 5px solid var(--primary);
+    line-height: 1.75;
+    font-size: 1.05rem;
+    color: #2d3748;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 2.2rem 0 1.2rem;
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 0.6rem;
+    display: inline-block;
+  }
+
+  .skills-grid, .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .skill-card, .project-card {
+    background: var(--light-bg);
+    border-radius: 12px;
+    padding: 1.2rem;
+    transition: all 0.25s ease;
+    border: 1px solid #e5e7eb;
+  }
+
+  .skill-card:hover, .project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(102,126,234,0.15);
+  }
+
+  .project-thumb {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+  }
+
+  .btn-back {
+    display: inline-block;
+    margin-top: 2.5rem;
+    padding: 0.8rem 1.8rem;
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.25s;
+  }
+
+  .btn-back:hover {
+    background: var(--primary);
+    color: white;
+  }
+</style>
+
+<div class="profile-page">
+  <div class="profile-header">
+    <h1>{{ profile.name|default:profile.user.username|default:"Developer" }}</h1>
+    {% if profile.short_intro %}
+      <p class="short-intro">{{ profile.short_intro }}</p>
+    {% endif %}
+  </div>
+
+  <div class="profile-main">
+    <div class="profile-layout">
+
+      <!-- Sidebar (now more compact) -->
+      <aside class="profile-sidebar">
+        {% if profile.profile_image %}
+          <img src="{{ profile.profile_image.url }}" class="profile-image" alt="{{ profile.name }}">
+        {% else %}
+          <div class="profile-image" style="background:var(--bg-gradient); display:flex; align-items:center; justify-content:center; color:white; font-size:5rem;">
+            👤
+          </div>
+        {% endif %}
+
+        {% if profile.social_twitter %}
+          <a href="https://twitter.com/{{ profile.social_twitter }}" target="_blank" 
+             style="display:block; margin:1.5rem auto; padding:0.7rem 1.5rem; background:var(--primary); color:white; border-radius:10px; text-decoration:none; max-width:180px;">
+            Follow on Twitter
+          </a>
+        {% endif %}
+      </aside>
+
+      <!-- Main content -->
+      <section>
+
+        <!-- Bio – prominent & beautiful -->
+        <div class="bio-section">
+          <h3>About {{ profile.name|default:"me" }}</h3>
+          {% if profile.bio %}
+            {{ profile.bio|linebreaks }}
+          {% else %}
+            <p style="font-style:italic; color:#6b7280;">
+              This developer hasn't shared their story yet...
+            </p>
+          {% endif %}
+        </div>
+
+        <h2 class="section-title">Skills</h2>
+        {% if profile.skill_set.all %}
+          <div class="skills-grid">
+            {% for skill in profile.skill_set.all %}
+            <div class="skill-card">
+              <strong style="color:var(--primary);">{{ skill.name }}</strong>
+              {% if skill.description %}
+                <p style="margin:0.6rem 0 0; font-size:0.95rem;">{{ skill.description }}</p>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color:var(--text-muted);">No skills listed yet.</p>
+        {% endif %}
+
+        <h2 class="section-title">Projects</h2>
+        {% if projects %}
+          <div class="projects-grid">
+            {% for project in projects %}
+            <a href="{% url 'project' project.id %}" class="project-card" style="text-decoration:none; color:inherit;">
+              {% if project.featured_image %}
+                <img src="{{ project.featured_image.url }}" class="project-thumb" alt="{{ project.title }}">
+              {% else %}
+                <div class="project-thumb" style="background:var(--bg-gradient); color:white; display:flex; align-items:center; justify-content:center; font-size:3rem;">
+                  📦
+                </div>
+              {% endif %}
+              <div style="padding:1rem;">
+                <strong>{{ project.title }}</strong>
+                <div style="margin-top:0.6rem; color:var(--text-muted); font-size:0.9rem;">
+                  {{ project.vote_ratio }}% • {{ project.vote_total }} votes
+                </div>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color:var(--text-muted);">No projects added yet.</p>
+        {% endif %}
+
+      </section>
+
+    </div>
+
+    <div style="text-align:center; margin-top:3rem;">
+      <a href="{% url 'profiles' %}" class="btn-back">← Back to All Profiles</a>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

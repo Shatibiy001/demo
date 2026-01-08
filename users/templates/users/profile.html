@@ -1,0 +1,193 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  /* =============================
+     DESIGN SYSTEM (CONSISTENT)
+  ============================== */
+  :root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --bg-gradient: linear-gradient(135deg, #667eea, #764ba2);
+    --card-bg: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+  }
+
+  body {
+    background: var(--bg-gradient);
+  }
+
+  /* =============================
+     PAGE WRAPPER
+  ============================== */
+  .profiles-page {
+    min-height: 100vh;
+    padding: 3rem 0;
+  }
+
+  /* =============================
+     HEADER SECTION
+  ============================== */
+  .hero-section {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-section h2 {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .hero-section p {
+    color: #e0e7ff;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  /* =============================
+     GRID
+  ============================== */
+  .profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  /* =============================
+     PROFILE CARD
+  ============================== */
+  .profile-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .profile-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.2);
+  }
+
+  /* =============================
+     IMAGE / AVATAR
+  ============================== */
+  .profile-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .profile-placeholder {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    color: #fff;
+    background: var(--bg-gradient);
+  }
+
+  /* =============================
+     CARD BODY
+  ============================== */
+  .profile-body {
+    padding: 1.4rem;
+  }
+
+  .profile-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--text-main);
+  }
+
+  .profile-intro {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* =============================
+     LINK RESET
+  ============================== */
+  .profile-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  /* =============================
+     EMPTY STATE
+  ============================== */
+  .empty-state {
+    text-align: center;
+    color: #e0e7ff;
+    font-size: 0.95rem;
+    margin-top: 2rem;
+  }
+</style>
+
+<main class="profiles-page">
+  <div class="container">
+
+    <!-- HEADER -->
+    <section class="hero-section">
+      <h2>Showing Profiles</h2>
+      <p>All Active profiles</p>
+    </section>
+
+    <!-- PROFILES GRID -->
+    <section class="profilesList">
+      <div class="profiles-grid">
+
+        {% for profile in profiles %}
+        <a href="{% url 'user_profile' profile.id %}" class="profile-link">
+          <article class="profile-card">
+
+            {% if profile.profile_image %}
+              <img
+                src="{{ profile.profile_image.url }}"
+                alt="{{ profile.name|default:profile.username }}"
+                class="profile-image"
+              />
+            {% else %}
+              <div class="profile-placeholder">👤</div>
+            {% endif %}
+
+            <div class="profile-body">
+              <h3 class="profile-name">
+                {{ profile.name|default:profile.user.username|default:profile.username }}
+              </h3>
+
+              {% if profile.short_intro %}
+                <p class="profile-intro">{{ profile.short_intro }}</p>
+              {% elif profile.bio %}
+                <p class="profile-intro">
+                  {{ profile.bio|slice:":140" }}{% if profile.bio|length > 140 %}…{% endif %}
+                </p>
+              {% else %}
+                <p class="profile-intro">No description provided.</p>
+              {% endif %}
+            </div>
+
+          </article>
+        </a>
+        {% empty %}
+          <p class="empty-state">No profiles found.</p>
+        {% endfor %}
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+{% endblock content %}
+

@@ -1,0 +1,191 @@
+
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        min-height: 100vh;
+    }
+
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(12px);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-card h1 {
+        text-align: center;
+        color: #fff;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-card input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+        font-size: 15px;
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .auth-card button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        background: #4f46e5;
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .auth-card button:hover {
+        background: #4338ca;
+        transform: translateY(-2px);
+    }
+
+    .auth-card p {
+        text-align: center;
+        margin-top: 1rem;
+        color: #f1f1f1;
+    }
+
+    .auth-card a {
+        color: #fde68a;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .auth-card a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        font-size: 14px;
+        text-align: center;
+        animation: shake 0.4s ease;
+        background: rgba(255, 80, 80, 0.25);
+        color: #fff;
+        border-left: 4px solid #ff4d4d;
+    }
+
+    @keyframes shake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        50% { transform: translateX(4px); }
+        75% { transform: translateX(-4px); }
+        100% { transform: translateX(0); }
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-card">
+
+        <!--  -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <!-- -->
+
+        {% if page == 'register' %}
+        <h1>Create Account</h1>
+
+        <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email address" required>
+
+            <div class="password-wrapper">
+                <input type="password" name="password1" placeholder="Password" required>
+                <span class="toggle-password" onclick="togglePassword(this)">Show</span>
+            </div>
+
+            <div class="password-wrapper">
+                <input type="password" name="password2" placeholder="Confirm password" required>
+                <span class="toggle-password" onclick="togglePassword(this)">Show</span>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+
+        {% else %}
+        <h1>Welcome Back</h1>
+
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <input type="text" name="username" placeholder="Username" required>
+
+            <div class="password-wrapper">
+                <input type="password" name="password" placeholder="Password" required>
+                <span class="toggle-password" onclick="togglePassword(this)">Show</span>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p>Don’t have an account? <a href="{% url 'register' %}">Register</a></p>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+    function togglePassword(el) {
+        const input = el.previousElementSibling;
+        if (input.type === "password") {
+            input.type = "text";
+            el.textContent = "Hide";
+        } else {
+            input.type = "password";
+            el.textContent = "Show";
+        }
+    }
+</script>
+
+{% endblock %}

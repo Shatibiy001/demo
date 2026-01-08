@@ -1,0 +1,324 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  :root {
+    --primary: #5e60ce;
+    --primary-dark: #4d4fc2;
+    --primary-light: #7678ed;
+    --bg: #f8f9ff;
+    --card-bg: #ffffff;
+    --text: #2d3748;
+    --text-light: #718096;
+    --border: #e2e8f0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .profile {
+    margin: 2.5rem 0;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .devInfo {
+    margin-bottom: 2.5rem;
+  }
+
+  .devInfo__title {
+    font-size: 1.8rem;
+    margin-bottom: 1.25rem;
+    color: var(--primary);
+    position: relative;
+    padding-bottom: 0.75rem;
+  }
+
+  .devInfo__title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 80px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin: 1.25rem 0 2rem;
+    flex-wrap: wrap;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+
+  /* Improved Project Card */
+  .project-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    transition: all 0.25s ease;
+    position: relative;
+  }
+
+  .project-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+    border-color: var(--primary-light);
+  }
+
+  .project__thumbnail {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+  }
+
+  .default-thumbnail {
+    height: 210px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 4rem;
+    font-weight: bold;
+  }
+
+  .card__body {
+    padding: 1.5rem 1.75rem;
+  }
+
+  .project__title {
+    font-size: 1.25rem;
+    margin: 0 0 0.75rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .project__author {
+    color: var(--primary);
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+
+  .project__author:hover {
+    text-decoration: underline;
+  }
+
+  .project--rating {
+    margin: 0.75rem 0;
+    font-size: 0.95rem;
+    color: var(--text-light);
+  }
+
+  .positive-score {
+    font-weight: 700;
+    color: #10b981;
+  }
+
+  .project__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  .tag {
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    background-color: #eef2ff;
+    color: var(--primary);
+  }
+
+  .card__footer {
+    padding: 1rem 1.75rem;
+    border-top: 1px solid var(--border);
+    background: #f9fafb;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Improved Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #cbd5e1;
+    color: #64748b;
+  }
+
+  .empty-state h3 {
+    color: #475569;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+  }
+
+  .empty-state p {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    background: linear-gradient(135deg, #4c51bf 0%, #667eea 100%);
+    padding: 4rem 1rem;
+    margin-bottom: 3rem;
+    color: white;
+    border-radius: 0 0 24px 24px;
+  }
+
+  .hero-section h2 {
+    font-size: 2.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-section h2 span {
+    color: #fde047;
+  }
+</style>
+
+<!-- Hero Search Section -->
+<section class="hero-section text-center">
+  <div class="container">
+    <h2>Find Amazing <span>Developers</span></h2>
+
+    <div class="hero-section__search" style="max-width: 580px; margin: 0 auto;">
+      <form class="form" action="#" method="get">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+          <input
+            class="input input--text"
+            style="flex: 1; min-width: 280px; padding: 1rem; border-radius: 8px; border: none; font-size: 1.1rem;"
+            id="formInput#search"
+            type="text"
+            name="text"
+            placeholder="Search by name, skill, or keyword..."
+          />
+          <input 
+            class="btn" 
+            type="submit" 
+            value="Search Developers" 
+            style="padding: 1rem 2rem; background: white; color: var(--primary); font-weight: 600; border: none; border-radius: 8px; cursor: pointer;"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Main Section -->
+<main class="profile">
+  <div class="container">
+    <div class="devInfo">
+      <h3 class="devInfo__title">My Projects</h3>
+
+      <div class="action-buttons">
+        <a href="{% url 'createproject' %}" class="btn" style="background: var(--primary); color: white; padding: 0.9rem 1.6rem; border-radius: 8px; text-decoration: none; font-weight: 500;">+ Add New Project</a>
+        <a href="{% url 'projects' %}" class="btn" style="background: #f1f5f9; color: #334155; padding: 0.9rem 1.6rem; border-radius: 8px; text-decoration: none; font-weight: 500;">View All Projects</a>
+      </div>
+
+      <div class="grid">
+        {% for project in projects %}
+        <div class="project-card">
+          <a href="{% url 'project' project.id %}" style="text-decoration: none; color: inherit; display: block;">
+            {% if project.featured_image and project.featured_image.name != 'projects/default.jpg' %}
+              <img class="project__thumbnail" src="{{ project.featured_image.url }}" alt="{{ project.title }}" />
+            {% else %}
+              <div class="default-thumbnail">📦</div>
+            {% endif %}
+
+            <div class="card__body">
+              <h3 class="project__title">{{ project.title }}</h3>
+              <p>
+                <a class="project__author" href="#">
+                  By {{ project.owner.name|default:project.owner.user.username|default:"Unknown" }}
+                </a>
+              </p>
+              <p class="project--rating">
+                <span class="positive-score">{{ project.vote_ratio }}%</span> Positive Feedback 
+                <span style="color:#94a3b8;">({{ project.vote_total }} votes)</span>
+              </p>
+
+              <div class="project__tags">
+                {% for tag in project.tags.all %}
+                  <span class="tag">{{ tag.name }}</span>
+                {% empty %}
+                  <span class="tag">No tags</span>
+                {% endfor %}
+              </div>
+            </div>
+          </a>
+
+          <div class="card__footer">
+            <a href="{% url 'project' project.id %}" class="btn" style="background: var(--primary); color: white;">View</a>
+            <a href="{% url 'updateproject' project.id %}" class="btn" style="background: #6366f1; color: white;">Edit</a>
+            <a href="{% url 'deleteproject' project.id %}" class="btn" style="background: #ef4444; color: white;">Delete</a>
+          </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+          <h3>You don't have any projects yet</h3>
+          <p>Showcase your work and attract potential collaborators or clients!<br>Click the "Add New Project" button to get started.</p>
+          <a href="{% url 'createproject' %}" class="btn" style="background: var(--primary); color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-size: 1.1rem; display: inline-block; margin-top: 1.5rem;">
+            + Create Your First Project
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Pagination -->
+<div class="pagination" style="margin: 4rem 0; text-align: center;">
+  <ul style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; list-style: none; padding: 0;">
+    {% if projects.has_previous %}
+      <li><a href="?page={{ projects.previous_page_number }}" class="btn" style="padding: 0.7rem 1.2rem; background: white; border: 1px solid #cbd5e1; border-radius: 8px; text-decoration: none;">← Prev</a></li>
+    {% else %}
+      <li><span class="btn" style="padding: 0.7rem 1.2rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; color: #94a3b8;">← Prev</span></li>
+    {% endif %}
+
+    {% for num in projects.paginator.page_range %}
+      {% if projects.number == num %}
+        <li><span class="btn" style="padding: 0.7rem 1.2rem; background: var(--primary); color: white; border-radius: 8px;">{{ num }}</span></li>
+      {% else %}
+        <li><a href="?page={{ num }}" class="btn" style="padding: 0.7rem 1.2rem; background: white; border: 1px solid #cbd5e1; border-radius: 8px; text-decoration: none;">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if projects.has_next %}
+      <li><a href="?page={{ projects.next_page_number }}" class="btn" style="padding: 0.7rem 1.2rem; background: white; border: 1px solid #cbd5e1; border-radius: 8px; text-decoration: none;">Next →</a></li>
+    {% else %}
+      <li><span class="btn" style="padding: 0.7rem 1.2rem; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; color: #94a3b8;">Next →</span></li>
+    {% endif %}
+  </ul>
+</div>
+
+{% endblock content %}
