@@ -24,17 +24,64 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 
 # --------------------------------------------------
-# SECURITY
+# SECURITY - FIXED!
 # --------------------------------------------------
 SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret-key")
 
-DEBUG = ENVIRONMENT != "production"
+# FORCE DEBUG TO FALSE ON RAILWAY
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+# GET THE ACTUAL RAILWAY URL FROM ENVIRONMENT
+RAILWAY_STATIC_URL = os.environ.get("RAILWAY_STATIC_URL", "")
+RAILWAY_PUBLIC_DOMAIN = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "")
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    ".up.railway.app",
+    ".up.railway.app",  # This allows ALL railway subdomains
 ]
+
+# DYNAMIC CSRF SETUP - THIS WILL CATCH YOUR ACTUAL URL
+CSRF_TRUSTED_ORIGINS = []
+
+# Add Railway URL from environment if available
+if RAILWAY_STATIC_URL:
+    # Convert from http:// to https://
+    railway_url = RAILWAY_STATIC_URL.replace("http://", "https://")
+    if railway_url not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(railway_url)
+
+# Add Railway public domain if available
+if RAILWAY_PUBLIC_DOMAIN:
+    railway_https = f"https://{RAILWAY_PUBLIC_DOMAIN}"
+    if railway_https not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(railway_https)
+
+# Always include the wildcard for Railway
+if "https://*.up.railway.app" not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append("https://*.up.railway.app")
+
+# Also include common local development URLs
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS.extend([
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:3000",
+    ])
+
+# SECURITY SETTINGS FOR PRODUCTION
+if ENVIRONMENT == "production" or not DEBUG:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    USE_X_FORWARDED_HOST = True
+    # Add the actual domain to ALLOWED_HOSTS
+    if RAILWAY_PUBLIC_DOMAIN:
+        ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
+else:
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
 
 # --------------------------------------------------
 # APPLICATIONS
@@ -57,7 +104,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -121,9 +167,7 @@ USE_TZ = True
 # --------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 STATICFILES_DIRS = [BASE_DIR / "static"]
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
@@ -135,16 +179,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # --------------------------------------------------
-# CSRF (FINAL FIX — DO NOT TOUCH)
-# --------------------------------------------------
-CSRF_TRUSTED_ORIGINS = [
-    "https://web-production-4e304.up.railway.app",
-]
-
-CSRF_COOKIE_SECURE = ENVIRONMENT == "production"
-SESSION_COOKIE_SECURE = ENVIRONMENT == "production"
-
-# --------------------------------------------------
 # DEFAULT PRIMARY KEY
 # --------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# DEBUG: Print CSRF settings on startup (will appear in Railway logs)
+import sys
+print(f"CSRF_TRUSTED_ORIGINS: {CSRF_TRUSTED_ORIGINS}", file=sys.stderr)
+print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}", file=sys.stderr)
+print(f"RAILWAY_PUBLIC_DOMAIN from env: {RAILWAY_PUBLIC_DOMAIN}", file=sys.stderr)
+print(f"RAILWAY_STATIC_URL from env: {RAILWAY_STATIC_URL}", file=sys.stderr)
