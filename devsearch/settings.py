@@ -146,6 +146,12 @@ MEDIA_ROOT = BASE_DIR / "media"
 # --------------------------------------------------
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-4e304.up.railway.app',
+    'https://*.up.railway.app',  # Optional: allows any Railway project URL (useful for testing)
+]
+
+
 
 # --------------------------------------------------
 # CSRF & COOKIES (IMPORTANT PART)
