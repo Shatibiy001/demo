@@ -165,14 +165,30 @@ USE_TZ = True
 # --------------------------------------------------
 # STATIC & MEDIA
 # --------------------------------------------------
+# --------------------------------------------------
+# STATIC & MEDIA - FIXED FOR RAILWAY
+# --------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Whitenoise for static files
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Media files (user uploaded)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Serve static/media files correctly in production
+if ENVIRONMENT == "production" or not DEBUG:
+    # IMPORTANT: Force Django to serve static files even in production
+    # This is needed for Railway
+    WHITENOISE_USE_FINDERS = True
+    WHITENOISE_MANIFEST_STRICT = False
+    WHITENOISE_ALLOW_ALL_ORIGINS = True
+    
+    # Also ensure Django can find static files
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # --------------------------------------------------
 # EMAIL (DEV)
 # --------------------------------------------------
