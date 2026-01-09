@@ -18,12 +18,10 @@ import os
 # --------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # --------------------------------------------------
 # ENVIRONMENT
 # --------------------------------------------------
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
-
 
 # --------------------------------------------------
 # SECURITY
@@ -37,7 +35,6 @@ ALLOWED_HOSTS = [
     "localhost",
     ".up.railway.app",
 ]
-
 
 # --------------------------------------------------
 # APPLICATIONS
@@ -54,7 +51,6 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
 ]
 
-
 # --------------------------------------------------
 # MIDDLEWARE
 # --------------------------------------------------
@@ -69,7 +65,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 
 # --------------------------------------------------
 # URLS & TEMPLATES
@@ -93,9 +88,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "devsearch.wsgi.application"
 
-
 # --------------------------------------------------
-# DATABASE (SQLite - OK for testing)
+# DATABASE (SQLite OK)
 # --------------------------------------------------
 DATABASES = {
     "default": {
@@ -103,7 +97,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 # --------------------------------------------------
 # PASSWORD VALIDATION
@@ -115,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
 # --------------------------------------------------
 # INTERNATIONALIZATION
 # --------------------------------------------------
@@ -124,57 +116,35 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-
 # --------------------------------------------------
-# STATIC & MEDIA FILES
+# STATIC & MEDIA
 # --------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-
 # --------------------------------------------------
 # EMAIL (DEV)
 # --------------------------------------------------
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-
 # --------------------------------------------------
-# CSRF & COOKIES (IMPORTANT PART)
+# CSRF (FINAL FIX — DO NOT TOUCH)
 # --------------------------------------------------
-if ENVIRONMENT == "production":
-    CSRF_TRUSTED_ORIGINS = [
-        "https://web-production-4e304.up.railway.app",
-        "https://*.up.railway.app",
-    ]
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    USE_X_FORWARDED_HOST = True
-else:
-    CSRF_TRUSTED_ORIGINS = [
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-    ]
-    CSRF_COOKIE_SECURE = False
-    SESSION_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = [
+    "https://web-production-4e304.up.railway.app",
+]
 
+CSRF_COOKIE_SECURE = ENVIRONMENT == "production"
+SESSION_COOKIE_SECURE = ENVIRONMENT == "production"
 
 # --------------------------------------------------
 # DEFAULT PRIMARY KEY
 # --------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-print("ENVIRONMENT:", ENVIRONMENT)
-print("DEBUG:", DEBUG)
-print("CSRF_TRUSTED_ORIGINS:", CSRF_TRUSTED_ORIGINS)
