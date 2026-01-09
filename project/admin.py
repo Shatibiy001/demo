@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Project, Review, Tag
+from .models import Project, Review, Tag, Message
 
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('title', 'owner', 'vote_ratio', 'vote_total', 'created')
@@ -37,3 +37,4 @@ class TagAdmin(admin.ModelAdmin):
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(Message)

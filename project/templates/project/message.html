@@ -1,0 +1,472 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --bg-start: #f0f5ff;
+    --bg-end: #e0e7ff;
+    --card: #ffffff;
+    --text: #111827;
+    --text-light: #64748b;
+    --border: #e0e7ff;
+    --success: #10b981;
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+  }
+
+  .projects-container {
+    max-width: 1200px;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+  }
+
+  .page-title {
+    text-align: center;
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--primary), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 3rem;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+  }
+
+  .project-card {
+    background: var(--card);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all 0.35s ease;
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.1);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .project-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+  }
+
+  .project-img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+  }
+
+  .project-body {
+    padding: 1.5rem;
+  }
+
+  .project-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    color: var(--primary);
+  }
+
+  .project-owner {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  .project-stats {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Message Button */
+  .message-dev-btn {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .message-dev-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+  }
+
+  /* Modal Styles */
+  .message-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+
+  .message-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background: var(--card);
+    margin: auto;
+    padding: 2rem;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border);
+    position: relative;
+    animation: modalSlideIn 0.3s ease-out;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-50px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .close-modal {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--text-light);
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+
+  .close-modal:hover {
+    background: #f1f5f9;
+    color: var(--text);
+  }
+
+  .dev-info {
+    background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .dev-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+  }
+
+  .dev-name {
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .dev-username {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.9rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, var(--success), #059669);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+  }
+
+  .submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .success-message {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    color: #166534;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border: 1px solid #bbf7d0;
+  }
+</style>
+
+<div class="projects-container">
+  <h1 class="page-title">Explore All Projects</h1>
+
+  {% if projects %}
+    <div class="projects-grid">
+      {% for project in projects %}
+        <div class="project-card" data-project-id="{{ project.id }}" data-owner-id="{{ project.owner.id }}" data-owner-name="{{ project.owner.name|default:project.owner.user.username|default:'Anonymous' }}" data-owner-avatar="{{ project.owner.avatar.url|default:'' }}">
+          {% if project.featured_image %}
+            <img src="{{ project.featured_image.url }}" alt="{{ project.title }}" class="project-img">
+          {% else %}
+            <div class="project-img" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; align-items: center; justify-content: center; color: white; font-size: 5rem;">
+              {{ project.title|slice:":1"|upper }}
+            </div>
+          {% endif %}
+
+          <div class="project-body">
+            <a href="{% url 'project' project.id %}" style="text-decoration: none; color: inherit;">
+              <h3 class="project-title">{{ project.title }}</h3>
+            </a>
+            <p class="project-owner">
+              By {{ project.owner.name|default:project.owner.user.username|default:"Anonymous" }}
+            </p>
+            <div class="project-stats">
+              <span><strong>{{ project.vote_ratio }}%</strong> Positive</span>
+              <span>{{ project.vote_total }} votes</span>
+            </div>
+            <button class="message-dev-btn" onclick="openMessageModal({{ project.id }}, {{ project.owner.id }}, '{{ project.owner.name|default:project.owner.user.username|default:"Anonymous" }}', '{% if project.owner.avatar %}{{ project.owner.avatar.url }}{% endif %}')">
+              💬 Message Developer
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 5rem 0; color: var(--text-light);">
+      <h3>No projects yet</h3>
+      <p>Be the first to showcase your work!</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Message Developer Modal -->
+<div id="messageModal" class="message-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Message Developer</h2>
+      <button class="close-modal" onclick="closeMessageModal()">&times;</button>
+    </div>
+    
+    <div id="successMessage" class="success-message" style="display: none;">
+      Message sent successfully! The developer will respond soon.
+    </div>
+
+    <form id="messageForm">
+      <input type="hidden" id="targetOwnerId" name="target_owner_id">
+      <input type="hidden" id="projectId" name="project_id">
+      
+      <div class="dev-info">
+        <div class="dev-avatar" id="modalDevAvatar">A</div>
+        <h3 class="dev-name" id="modalDevName">Developer Name</h3>
+        <p class="dev-username" id="modalDevUsername">@username</p>
+      </div>
+
+      <div class="form-group">
+        <label for="messageSubject">Subject</label>
+        <input type="text" id="messageSubject" name="subject" required maxlength="100" placeholder="e.g., Collaboration opportunity">
+      </div>
+
+      <div class="form-group">
+        <label for="messageBody">Message</label>
+        <textarea id="messageBody" name="message" required maxlength="1000" placeholder="Tell the developer why you're reaching out..."></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn">Send Message</button>
+    </form>
+  </div>
+</div>
+
+<script>
+let currentProjectData = {};
+
+function openMessageModal(projectId, ownerId, ownerName, ownerAvatar) {
+  currentProjectData = {
+    projectId: projectId,
+    ownerId: ownerId,
+    ownerName: ownerName,
+    ownerAvatar: ownerAvatar
+  };
+
+  // Populate modal data
+  document.getElementById('targetOwnerId').value = ownerId;
+  document.getElementById('projectId').value = projectId;
+  document.getElementById('modalDevName').textContent = ownerName;
+  document.getElementById('modalDevUsername').textContent = `@${ownerName.toLowerCase().replace(/\s+/g, '')}`;
+  
+  const devAvatar = document.getElementById('modalDevAvatar');
+  if (ownerAvatar) {
+    devAvatar.style.backgroundImage = `url(${ownerAvatar})`;
+    devAvatar.style.backgroundSize = 'cover';
+    devAvatar.textContent = '';
+  } else {
+    devAvatar.style.backgroundImage = '';
+    devAvatar.textContent = ownerName.charAt(0).toUpperCase();
+    devAvatar.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+  }
+
+  // Reset form
+  document.getElementById('messageSubject').value = '';
+  document.getElementById('messageBody').value = '';
+  document.getElementById('successMessage').style.display = 'none';
+  document.getElementById('messageForm').reset();
+
+  // Show modal
+  document.getElementById('messageModal').classList.add('active');
+  document.body.style.overflow = 'hidden'; // Prevent background scroll
+}
+
+function closeMessageModal() {
+  document.getElementById('messageModal').classList.remove('active');
+  document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside
+document.getElementById('messageModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeMessageModal();
+  }
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('messageModal').classList.contains('active')) {
+    closeMessageModal();
+  }
+});
+
+// Form submission
+document.getElementById('messageForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const submitBtn = document.querySelector('.submit-btn');
+  const formData = new FormData(this);
+  
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending...';
+
+  try {
+    const response = await fetch('/send-message-to-developer/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').getAttribute('value')
+      }
+    });
+
+    if (response.ok) {
+      document.getElementById('successMessage').style.display = 'block';
+      document.getElementById('messageForm').style.display = 'none';
+      setTimeout(() => {
+        closeMessageModal();
+      }, 2000);
+    } else {
+      alert('Failed to send message. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred. Please try again.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send Message';
+  }
+});
+</script>
+
+{% endblock %}

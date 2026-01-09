@@ -4,7 +4,7 @@ from .models import Project
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['title', 'owner', 'featured_image', 'description', 'demo_link', 'source_link', 'tags']
+        fields = ['title', 'featured_image', 'description', 'demo_link',]
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-input',

@@ -2,6 +2,7 @@ from django.urls import path
 from . import views 
 
 urlpatterns = [
+    path('send-message-to-developer/', views.send_message_to_developer, name='send_message'),
     path('project', views.projects, name='projects'),
     path('project/<uuid:pk>/', views.project_detail, name='project'), 
     path('createproject/', views.createproject, name="createproject"),

@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from .models import Project
+from .models import Project, Message, User
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .forms import ProjectForm 
@@ -70,3 +72,49 @@ def deleteproject(request, pk):
         return redirect(projects)
     context = {'object':project}
     return render(request, 'project/delete.html', context)
+
+@csrf_protect
+@login_required
+def send_message_to_developer(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+    try:
+        target_owner_id = int(request.POST.get('target_owner_id'))
+        project_id = request.POST.get('project_id')  # can be empty
+        subject = request.POST.get('subject', '').strip()
+        body = request.POST.get('message', '').strip()
+
+        if not body:
+            return JsonResponse({'status': 'error', 'message': 'Message cannot be empty'}, status=400)
+
+        receiver = User.objects.get(id=target_owner_id)
+
+        # Optional: check that receiver != sender
+        if receiver == request.user:
+            return JsonResponse({'status': 'error', 'message': 'Cannot message yourself'}, status=400)
+
+        project = None
+        if project_id:
+            try:
+                project = Project.objects.get(id=project_id)
+            except Project.DoesNotExist:
+                pass  # just continue without project
+
+        Message.objects.create(
+            sender=request.user,
+            receiver=receiver,
+            project=project,
+            subject=subject,
+            body=body
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Message sent successfully!'
+        })
+
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

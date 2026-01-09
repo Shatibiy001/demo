@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from users.models import Profile
+from django.contrib.auth import get_user_model
 # Create your models here.
 class Project(models.Model):
     owner = models.ForeignKey(Profile, null= True, blank=True, on_delete=models.SET_NULL)
@@ -43,3 +44,23 @@ class Tag(models.Model):
     
     def __str__(self):
          return self.name
+     
+#new
+User = get_user_model()
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    project = models.ForeignKey('Project', on_delete=models.SET_NULL, null=True, blank=True)
+    
+    subject = models.CharField(max_length=200, blank=True)
+    body = models.TextField()
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.sender} → {self.receiver} | {self.subject}"
