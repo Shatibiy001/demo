@@ -173,3 +173,8 @@ else:
 # DEFAULT PRIMARY KEY
 # --------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+print("ENVIRONMENT:", ENVIRONMENT)
+print("DEBUG:", DEBUG)
+print("CSRF_TRUSTED_ORIGINS:", CSRF_TRUSTED_ORIGINS)

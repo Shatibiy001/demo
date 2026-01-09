@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .forms import ProjectForm 
+from django.conf import settings
 # Create your views here.
 
 # projects/views.py
