@@ -146,24 +146,25 @@ MEDIA_ROOT = BASE_DIR / "media"
 # --------------------------------------------------
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://web-production-4e304.up.railway.app',
-    'https://*.up.railway.app',  # Optional: allows any Railway project URL (useful for testing)
-]
-
-
 
 # --------------------------------------------------
 # CSRF & COOKIES (IMPORTANT PART)
 # --------------------------------------------------
 if ENVIRONMENT == "production":
     CSRF_TRUSTED_ORIGINS = [
+        "https://web-production-4e304.up.railway.app",
         "https://*.up.railway.app",
     ]
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    USE_X_FORWARDED_HOST = True
 else:
-    CSRF_TRUSTED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ]
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
 
